@@ -1,0 +1,37 @@
+{
+  "name": "bacon-stream",
+  "version": "0.1.0",
+  "description": "readable stream of bacon ipsum content from baconipsum dot com",
+  "author": "Dan Jarvis <djarvis270@gmail.com>",
+  "keywords": [
+    "lorem",
+    "ipsum",
+    "bacon",
+    "fatback",
+    "turducken",
+    "swine"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "dependencies": {
+    "xtend": "2.1.2"
+  },
+  "devDependencies": {
+    "tap": "~0.4.0"
+  },
+  "scripts": {
+    "test": "tap ./test"
+  },
+  "homepage": "https://github.com/danjarvis/bacon-stream",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/danjarvis/bacon-stream.git"
+  },
+  "bugs": {
+    "url": "https://github.com/danjarvis/bacon-stream/issues",
+    "email": "djarvis270@gmail.com"
+  },
+  "license": "MIT"
+}
