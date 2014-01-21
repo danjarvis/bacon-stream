@@ -18,42 +18,31 @@ function BaconStream(options) {
   
   Readable.call(this);
   this.options = defaults;
-  
-  var opts = options || {};
-  if (String === opts.constructor)
-    this.options.type = opts;
-  else if (Number === opts.constructor)
-    this.options.paras = opts
-  else
-    this.options = xtend(defaults, opts);
-  
-  this.BACON = null;
+  this.xtend(options);
+  this._done = false;
+  this._bacon = [];
+  this._requests = [this.getUri()];
 }
 util.inherits(BaconStream, Readable);
 
 BaconStream.prototype._read = function() {
-  var self = this;
-  if (null === this.BACON) {
-    this.getBacon(function(err, res) {
-      if (err) {
-        // bacon > error
-        self.push('bacon');
-        self.push(' and this: ' + err.message);
-        self.push(null);
-        return;
-      }
-      
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        self.BACON = chunk;
-      });
-      res.on('end', function() {
-        self.BACON = JSON.parse(self.BACON);
-        if (Array === self.BACON.constructor)
-          self.push(self.BACON.join(' '));
-      });
-    });
+  if (this._bacon.length > 0) {
+    this.pushBacon();
+  } else if (this._done) {
+    this.push(null);
+  } else if (this._requests.length > 0) {
+    this.getBacon(this._requests.shift());
   }
+};
+
+BaconStream.prototype.xtend = function(options) {
+  var opts = options || {};
+  if (String === opts.constructor)
+    this.options.type = opts;
+  else if (Number === opts.constructor)
+    this.options.paras = opts;
+  else
+    this.options = xtend(defaults, opts);
 };
 
 BaconStream.prototype.getUri = function() {
@@ -64,14 +53,32 @@ BaconStream.prototype.getUri = function() {
     util.format('%s', (opts.startWithLorem ? '&start-with-lorem=1' : ''));
 };
 
-BaconStream.prototype.getBacon = function(fn) {
-  http.get(this.getUri(), function(res) {
-    fn(null, res);
-  }).on('error', fn);
+BaconStream.prototype.getBacon = function(api) {
+  var newBacon = "", self = this;
+  http.get(api, function(res) {
+    res.on('data', function (chunk) {
+      newBacon += chunk;
+    });
+    res.on('end', function() {
+      self._bacon = self._bacon.concat(JSON.parse(newBacon));
+      self.pushBacon();
+    });
+  }).on('error', function(e) {
+    console.log(e);
+  });
 };
 
-BaconStream.prototype.nom = function(s) {
-  this.pipe(s || process.stdout);
+BaconStream.prototype.pushBacon = function() {
+  while (this._bacon.length > 0) {
+    if (false === this.push(this._bacon.shift()))
+      break;
+  }
+  this._done = this._requests.length < 1 ? true : false;
+};
+
+BaconStream.prototype.nom = function(opts) {
+  this.xtend(opts);
+  this._requests.push(this.getUri());
   return this;
 };
 
