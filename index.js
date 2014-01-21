@@ -18,11 +18,20 @@ function BaconStream(options) {
   
   Readable.call(this);
   this.options = defaults;
-  this.xtend(options);  
+  this.xtend(options);
+  this._done = false;
+  this._bacon = [];
+  this._requests = [this.getUri()];
 }
 util.inherits(BaconStream, Readable);
 
 BaconStream.prototype._read = function() {
+  if (this._bacon.length > 0) {
+    this.pushBacon();
+  } else if (this._done) {
+    this.push(null);
+  } else if (this._requests.length > 0) {
+    this.getBacon(this._requests.shift());
   }
 };
 
@@ -44,14 +53,32 @@ BaconStream.prototype.getUri = function() {
     util.format('%s', (opts.startWithLorem ? '&start-with-lorem=1' : ''));
 };
 
-BaconStream.prototype.getBacon = function(fn) {
-  http.get(this.getUri(), function(res) {
-    fn(null, res);
-  }).on('error', fn);
+BaconStream.prototype.getBacon = function(api) {
+  var newBacon = "", self = this;
+  http.get(api, function(res) {
+    res.on('data', function (chunk) {
+      newBacon += chunk;
+    });
+    res.on('end', function() {
+      self._bacon = self._bacon.concat(JSON.parse(newBacon));
+      self.pushBacon();
+    });
+  }).on('error', function(e) {
+    console.log(e);
+  });
 };
 
-BaconStream.prototype.nom = function(s) {
-  this.pipe(s || process.stdout);
+BaconStream.prototype.pushBacon = function() {
+  while (this._bacon.length > 0) {
+    if (false === this.push(this._bacon.shift()))
+      break;
+  }
+  this._done = this._requests.length < 1 ? true : false;
+};
+
+BaconStream.prototype.nom = function(opts) {
+  this.xtend(opts);
+  this._requests.push(this.getUri());
   return this;
 };
 
