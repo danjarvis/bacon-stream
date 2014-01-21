@@ -31,7 +31,7 @@ BaconStream.prototype.xtend = function(options) {
   if (String === opts.constructor)
     this.options.type = opts;
   else if (Number === opts.constructor)
-    this.options.paras = opts
+    this.options.paras = opts;
   else
     this.options = xtend(defaults, opts);
 };
