@@ -1,6 +1,6 @@
 {
   "name": "bacon-stream",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "readable stream of bacon ipsum content from baconipsum dot com",
   "author": "Dan Jarvis <djarvis270@gmail.com>",
   "keywords": [
