@@ -5,20 +5,11 @@ readable stream of bacon ipsum content from [baconipsum.com](http://baconipsum.c
 
 # Usage
 
-``` js
+```js
 var bacon = require('bacon-stream');
 
 // pipe to stdout
 bacon('meat-and-filler').pipe(process.stdout);
-
-// same as bacon().pipe(process.stdout);
-bacon().om();
-
-// same as bacon().pipe(process.stdout);
-bacon({type: 'all-meat'}).nom();
-
-// om() and nom() are chainable
-bacon({sentences: 7}).om().nom().nom();
 ```
 
 # Methods
@@ -49,15 +40,30 @@ Shorthand to set just `paras`:
 bacon(10); // {paras: 10}
 ```
 
+```js
+bacon().om(options);
+```
+
+Adds another request to the queue using the specified options.
+
+```js
+bacon.nom(options);
+```
+
+Adds another request to the queue using the specified options.
+
+Note that `om()` and `nom()` return `this` so they can be chained to build up a queue of varying deliciousness:
+
+```js
+bacon('all-meat').om({sentences: 20}).nom({type: 'all-meat', paras: 10}).pipe(process.stdout);
+```
+
+The example above will make 3 API requests to [baconipsum.com](http://baconipsum.com).
+
 # Install
 
 ```
 npm install bacon-stream
 ```
-
-# TODO
-
-* refresh and cache
-* om() and nom() extend
 
 License: [MIT](http://danjarvis.mit-license.org)
