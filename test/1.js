@@ -14,6 +14,7 @@ test('options', function(t) {
   t.equal(b.options.sentences, 100, 'sentences set');
   t.equal(b.options.startWithLorem, true, 'startWithLorem set');
   t.equal(b.options.https, true, 'https set');
+  t.equal(b._requests.length, 1, 'one request in queue');
 
   b = bacon('all-meat');
   t.equal(b.options.type, 'all-meat', 'type as string set');
