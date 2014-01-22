@@ -15,7 +15,7 @@ var Readable = require('stream').Readable
 function BaconStream(options) {
   if (!(this instanceof(BaconStream)))
     return new BaconStream(options);
-  
+
   Readable.call(this);
   this.options = defaults;
   this.xtend(options);
