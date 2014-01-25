@@ -23,6 +23,8 @@ function BaconStream(options) {
   this._bacon = [];
   this._requests = [this.getUri()];
 }
+
+module.exports = BaconStream;
 util.inherits(BaconStream, Readable);
 
 BaconStream.prototype._read = function() {
@@ -84,6 +86,4 @@ BaconStream.prototype.nom = function(opts) {
 
 BaconStream.prototype.om = BaconStream.prototype.nom;
 
-module.exports = function(options) {
-  return new BaconStream(options);
 }
