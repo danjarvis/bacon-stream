@@ -12,16 +12,15 @@ var Readable = require('stream').Readable
   }
 ;
 
-function BaconStream(options) {
-  if (!(this instanceof(BaconStream)))
-    return new BaconStream(options);
+function BaconStream(opts) {
+  if (!(this instanceof BaconStream))
+    return new BaconStream(opts);
 
   Readable.call(this);
-  this.options = defaults;
-  this.xtend(options);
+  this.options = setOptions(opts || {});
   this._done = false;
   this._bacon = [];
-  this._requests = [this.getUri()];
+  this._requests = [getUri(this.options)];
 }
 
 module.exports = BaconStream;
@@ -35,24 +34,6 @@ BaconStream.prototype._read = function() {
   } else if (this._requests.length > 0) {
     this.getBacon(this._requests.shift());
   }
-};
-
-BaconStream.prototype.xtend = function(options) {
-  var opts = options || {};
-  if (String === opts.constructor)
-    this.options.type = opts;
-  else if (Number === opts.constructor)
-    this.options.paras = opts;
-  else
-    this.options = xtend(defaults, opts);
-};
-
-BaconStream.prototype.getUri = function() {
-  var opts = this.options;
-  return util.format('%s://%s/api/?', (opts.https ? 'https' : 'http'), host) +
-    util.format('type=%s', opts.type) +
-    util.format('&%s=%d', (opts.paras > 0 ? 'paras' : 'sentences'), (opts.paras >= 5 ? opts.paras : opts.sentences)) +
-    util.format('%s', (opts.startWithLorem ? '&start-with-lorem=1' : ''));
 };
 
 BaconStream.prototype.getBacon = function(api) {
@@ -79,11 +60,27 @@ BaconStream.prototype.pushBacon = function() {
 };
 
 BaconStream.prototype.nom = function(opts) {
-  this.xtend(opts);
-  this._requests.push(this.getUri());
+  this.options = setOptions(opts || {});
+  this._requests.push(getUri(this.options));
   return this;
 };
 
 BaconStream.prototype.om = BaconStream.prototype.nom;
 
+function setOptions(opts) {
+  var o = {};
+  if (String === opts.constructor)
+    o.type = opts;
+  else if (Number === opts.constructor)
+    o.paras = opts;
+  else
+    o = opts;
+  return xtend(defaults, o);
+}
+
+function getUri(opts) {
+  return util.format('%s://%s/api/?', (opts.https ? 'https' : 'http'), host) +
+    util.format('type=%s', opts.type) +
+    (opts.sentences > 0 ? util.format('&sentences=%d', opts.sentences) : util.format('&paras=%d', opts.paras)) +
+    util.format('%s', (opts.startWithLorem ? '&start-with-lorem=1' : ''));
 }
