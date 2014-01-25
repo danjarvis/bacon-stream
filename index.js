@@ -2,7 +2,7 @@ var Readable = require('stream').Readable
   , http = require('http')
   , util = require('util')
   , xtend = require('xtend')
-  , host = "baconipsum.com"
+  , host = 'baconipsum.com'
   , defaults = {
       type: 'meat-and-filler'
     , paras: 5
@@ -54,7 +54,7 @@ BaconStream.prototype.getUri = function() {
 };
 
 BaconStream.prototype.getBacon = function(api) {
-  var newBacon = "", self = this;
+  var newBacon = '', self = this;
   http.get(api, function(res) {
     res.on('data', function (chunk) {
       newBacon += chunk;
